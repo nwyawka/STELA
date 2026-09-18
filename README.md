@@ -36,5 +36,5 @@ See [the user manual](docs/user-manual.md), [language charter](docs/language-cha
 
 ## Examples
 
-- [Rover braking model](examples/rover.mbse): executable with the current prototype.
+- [Rover braking model and guide](examples/rover.md): executable with the current prototype and explained section by section.
 - [Exoplanet water instrument](examples/exoplanet-water-instrument/README.md): self-contained STELA 0.2 design example with science-source inputs, datasets, expected traceability, architecture, results, and acceptance criteria.
