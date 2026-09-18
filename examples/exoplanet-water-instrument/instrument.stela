@@ -1,0 +1,235 @@
+model ExoplanetWaterInstrument
+
+document science_case:
+    id: DOC-SCI-001
+    title: "Water Vapor Observations of Temperate Exoplanets"
+    file: "inputs/science-case.md"
+    version: "1.0"
+    owner: "Exoplanet Science Team"
+
+dataset target_catalog:
+    id: DATA-001
+    file: "inputs/target-catalog.csv"
+    schema: TargetCatalog
+    version: "1.0"
+    role: scenario_input
+
+dataset observing_conditions:
+    id: DATA-002
+    file: "inputs/observing-conditions.yaml"
+    schema: ObservingConditions
+    version: "1.0"
+    role: scenario_input
+
+dataset instrument_assumptions:
+    id: DATA-003
+    file: "inputs/instrument-assumptions.yaml"
+    schema: InstrumentAssumptions
+    version: "1.0"
+    role: design_input
+
+dataset calibration_data:
+    id: DATA-004
+    file: "inputs/calibration-data.csv"
+    schema: DetectorCalibration
+    version: "1.0"
+    role: verification_input
+
+need characterize_water:
+    id: NEED-001
+    statement: "Determine whether water vapor is present in nearby temperate exoplanet atmospheres."
+    source: DOC-SCI-001 section 2
+    stakeholder: "Exoplanet Science Team"
+    priority: primary
+    status: approved
+
+objective measure_water_abundance:
+    id: OBJ-001
+    statement: "Estimate atmospheric water-vapor abundance for selected temperate exoplanets."
+    addresses NEED-001
+    source: DOC-SCI-001 section 3
+    success: "Detect water and constrain abundance to within one order of magnitude."
+    status: approved
+
+property atmospheric_water_abundance:
+    id: PROP-001
+    quantity: volume_mixing_ratio
+    subject: exoplanet_atmosphere
+
+observable water_absorption_band:
+    id: OBS-001
+    measures PROP-001
+    phenomenon: spectral_absorption
+    wavelength: 2.7 um
+    method: transmission_spectroscopy
+
+measurement water_band_measurement:
+    id: MEAS-001
+    derives OBJ-001
+    observes OBS-001
+
+requirement wavelength_coverage:
+    id: MR-001
+    shall spectrum.wavelength_min <= 2.6 um
+    shall spectrum.wavelength_max >= 2.9 um
+    derives MEAS-001
+    source: DOC-SCI-001 section 4.1
+    rationale: "The selected water absorption feature spans this wavelength interval."
+    verify_by analysis
+
+requirement spectral_resolution:
+    id: MR-002
+    shall spectrum.resolving_power >= 1000
+    derives MEAS-001
+    source: DOC-SCI-001 section 4.2
+    rationale: "Adjacent spectral structure must be distinguished from the water feature."
+    verify_by analysis
+
+requirement signal_to_noise:
+    id: MR-003
+    shall spectrum.signal_to_noise >= 10
+    condition: "per spectral resolution element"
+    assumption: "Target star K magnitude <= 9"
+    derives MEAS-001
+    source: DOC-SCI-001 section 4.3
+    verify_by analysis
+
+requirement detector_wavelength_range:
+    id: INST-001
+    shall spectrometer.wavelength_min <= 2.6 um
+    shall spectrometer.wavelength_max >= 2.9 um
+    derives MR-001
+    verify_by test
+
+requirement instrument_resolving_power:
+    id: INST-002
+    shall spectrometer.resolving_power >= 1000
+    condition: "across 2.6..2.9 um"
+    derives MR-002
+    verify_by test
+
+requirement detector_noise:
+    id: INST-003
+    shall detector.read_noise <= 8 electron
+    condition: "at detector.operating_temperature <= 45 K"
+    derives MR-003
+    verify_by test
+
+requirement pointing_stability:
+    id: SYS-001
+    shall observatory.pointing_jitter <= 10 mas
+    derives MR-003
+    verify_by analysis
+
+requirement observation_duration:
+    id: OPS-001
+    shall observation.duration >= 3 h
+    derives MR-003
+    verify_by demonstration
+
+component Telescope:
+    port photon_output: PhotonStream out
+
+component Spectrometer:
+    property wavelength_min: um = 2.5
+    property wavelength_max: um = 3.0
+    property resolving_power: 1 = 1200
+    port photon_input: PhotonStream in
+    port spectral_output: SpectralPhotonStream out
+    allocated INST-001
+    allocated INST-002
+    satisfies INST-001
+    satisfies INST-002
+
+component Detector:
+    property read_noise: electron = 6
+    property operating_temperature: K = 42
+    port photon_input: SpectralPhotonStream in
+    port samples: DetectorSamples out
+    allocated INST-003
+    satisfies INST-003
+
+component Electronics:
+    port sample_input: DetectorSamples in
+    port science_data: ScienceData out
+
+component ThermalControl:
+    property detector_setpoint: K = 42
+
+component CalibrationSource:
+    port calibration_photons: PhotonStream out
+
+component Observatory:
+    property pointing_jitter: mas = 8
+    allocated SYS-001
+    satisfies SYS-001
+
+component Operations:
+    property observation_duration: h = 3.2
+    allocated OPS-001
+    satisfies OPS-001
+
+component Instrument:
+    part telescope: Telescope
+    part spectrometer: Spectrometer
+    part detector: Detector
+    part electronics: Electronics
+    part thermal_control: ThermalControl
+    part calibration_source: CalibrationSource
+    connect telescope.photon_output -> spectrometer.photon_input
+    connect spectrometer.spectral_output -> detector.photon_input
+    connect detector.samples -> electronics.sample_input
+    allocated MR-001
+    allocated MR-002
+    allocated MR-003
+
+action calculate_signal_to_noise:
+    input signal_electrons: electron
+    input noise_electrons: electron
+    output signal_to_noise: 1
+    set signal_to_noise = signal_electrons / noise_electrons
+
+action simulate_observation:
+
+action process_spectrum:
+
+action estimate_water_abundance:
+    output water_detected: bool
+    set water_detected = true
+
+scenario nominal_transit_observation:
+    uses DATA-001
+    uses DATA-002
+    uses DATA-003
+    given target.name = "STELA-1 b"
+    given target.star_k_magnitude = 8.5
+    given target.transit_duration = 3.2 h
+    given observatory.pointing_jitter = 8 mas
+    set detector.operating_temperature = 42 K
+    perform calculate_signal_to_noise with signal_electrons = 1200, noise_electrons = 100
+    assert calculate_signal_to_noise.signal_to_noise >= 10
+    assert spectrometer.wavelength_min <= 2.6 um
+    assert spectrometer.wavelength_max >= 2.9 um
+    assert spectrometer.resolving_power >= 1000
+    verifies MR-001
+    verifies MR-002
+    verifies MR-003
+    verifies SYS-001
+    verifies OPS-001
+    validates OBJ-001
+
+scenario detector_noise_test:
+    uses DATA-004
+    given chamber.temperature = 42 K
+    assert calibration.maximum_read_noise <= 8 electron
+    verifies INST-003
+
+scenario synthetic_science_retrieval:
+    uses DATA-001
+    uses DATA-002
+    given synthetic_atmosphere.water_abundance = 0.001
+    perform simulate_observation
+    perform process_spectrum
+    perform estimate_water_abundance
+    assert estimate_water_abundance.water_detected == true
+    validates OBJ-001

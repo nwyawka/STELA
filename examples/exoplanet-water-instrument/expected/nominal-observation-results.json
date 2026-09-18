@@ -1,0 +1,20 @@
+{
+  "scenario": "nominal_transit_observation",
+  "status": "pass",
+  "inputs": {
+    "target": "STELA-1 b",
+    "star_k_magnitude": 8.5,
+    "transit_duration_h": 3.2,
+    "pointing_jitter_mas": 8,
+    "detector_temperature_k": 42
+  },
+  "results": {
+    "signal_to_noise": 12.0,
+    "wavelength_min_um": 2.5,
+    "wavelength_max_um": 3.0,
+    "resolving_power": 1200
+  },
+  "verified": ["MR-001", "MR-002", "MR-003", "SYS-001", "OPS-001"],
+  "validated": ["OBJ-001"]
+}
+

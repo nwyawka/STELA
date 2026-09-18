@@ -1,0 +1,11 @@
+schema: ObservingConditions
+version: "1.0"
+observatory:
+  pointing_jitter_mas: 8
+  collecting_area_m2: 12
+observation:
+  duration_h: 3.2
+  repeats: 1
+environment:
+  background_electron_per_resolution_element: 36
+

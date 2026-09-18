@@ -1,0 +1,12 @@
+{
+  "model": "ExoplanetWaterInstrument",
+  "needs": {"total": 1, "addressed": 1, "validated": 1},
+  "objectives": {"total": 1, "with_observables": 1, "validated": 1},
+  "requirements": {
+    "total": 8,
+    "allocated": 8,
+    "satisfied": 5,
+    "with_verification_scenarios": 8
+  },
+  "known_gaps": 3
+}

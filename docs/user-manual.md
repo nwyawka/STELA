@@ -51,6 +51,7 @@ The current 0.1 interpreter implements:
 This manual also defines the planned science-traceability vocabulary for version 0.2:
 
 - `document`
+- `dataset`
 - `need`
 - `objective`
 - `observable`
@@ -66,6 +67,7 @@ This manual also defines the planned science-traceability vocabulary for version
 - `assumption`
 - `condition`
 - `given`
+- `uses`
 - `status`
 - `confidence`
 
@@ -253,7 +255,22 @@ document science_case:
 
 A document is evidence and provenance. Its prose is not automatically treated as an approved requirement.
 
-### 4.3 `need` (planned)
+### 4.3 `dataset` (planned)
+
+`dataset` registers structured input used by scenarios, analyses, calibration, or verification:
+
+```text
+dataset target_catalog:
+    id: DATA-001
+    file: "inputs/target-catalog.csv"
+    schema: TargetCatalog
+    version: "1.0"
+    role: scenario_input
+```
+
+Unlike `document`, which preserves human-authored source material, `dataset` identifies machine-readable values consumed by the model. A dataset declaration records provenance and structure; it does not embed the entire dataset in the model.
+
+### 4.4 `need` (planned)
 
 `need` records what a stakeholder wants to learn, achieve, prevent, or enable.
 
@@ -273,7 +290,7 @@ A need:
 - May need clarification.
 - Does not, by itself, impose a verified engineering commitment.
 
-### 4.4 `objective` (planned)
+### 4.5 `objective` (planned)
 
 `objective` states a specific outcome that addresses a need.
 
@@ -287,7 +304,7 @@ objective measure_water_abundance:
 
 An objective should describe an observable or assessable outcome. Multiple objectives may address one need, and one objective may address multiple needs.
 
-### 4.5 Scientific `property` (planned context)
+### 4.6 Scientific `property` (planned context)
 
 At the science level, a property is the physical, chemical, or biological characteristic the investigation wants to determine.
 
@@ -308,7 +325,7 @@ component Detector:
 
 The containing scope tells the parser which form is intended.
 
-### 4.6 `observable` (planned)
+### 4.7 `observable` (planned)
 
 `observable` describes what can actually be detected or calculated from acquired data.
 
@@ -323,7 +340,7 @@ observable water_absorption_band:
 
 The distinction is important: atmospheric abundance is a desired scientific property, while spectral absorption is the observable used to infer it.
 
-### 4.7 `measurement` (planned)
+### 4.8 `measurement` (planned)
 
 `measurement` groups requirements associated with measuring an observable.
 
@@ -336,7 +353,7 @@ measurement water_band_measurement:
 
 Measurement requirements normally specify some combination of range, accuracy, precision, uncertainty, spatial resolution, spectral resolution, cadence, coverage, and confidence.
 
-### 4.8 `requirement`
+### 4.9 `requirement`
 
 `requirement` records an objective, testable commitment.
 
@@ -532,7 +549,19 @@ given observatory.pointing_jitter = 8 mas
 
 `given` differs from `set` in intent: `given` is an assumed scenario condition, while `set` changes a modeled value as part of setup or execution.
 
-### 7.3 `perform`
+### 7.3 `uses` (planned)
+
+`uses` declares an input artifact consumed by a scenario or analysis:
+
+```text
+scenario nominal_transit_observation:
+    uses DATA-001
+    uses DATA-002
+```
+
+The referenced artifact must exist, match its declared schema, and be included in the execution provenance. `uses` does not imply that every record in a dataset is selected by the scenario.
+
+### 7.4 `perform`
 
 `perform` executes an action:
 
@@ -555,7 +584,7 @@ perform observe_transit
 perform process_spectrum
 ```
 
-### 7.4 `assert`
+### 7.5 `assert`
 
 `assert` defines a condition that must be true during scenario execution:
 
@@ -1087,6 +1116,7 @@ Machine assistance may propose elements and relationships. Approval remains an a
 |---|---|---|
 | `model` | Name the model | Implemented |
 | `document` | Register a source artifact | Planned |
+| `dataset` | Register a structured model or scenario input | Planned |
 | `need` | Record a qualitative stakeholder or science need | Planned |
 | `objective` | Define an outcome addressing a need | Planned |
 | `property` | Define a scientific property or component value | Partial |
@@ -1103,6 +1133,7 @@ Machine assistance may propose elements and relationships. Approval remains an a
 | `set` | Assign an action output or scenario value | Implemented |
 | `scenario` | Define an operational, analytical, or test case | Implemented |
 | `given` | Declare a scenario condition | Planned |
+| `uses` | Declare an artifact consumed by a scenario or analysis | Planned |
 | `perform` | Execute an action | Implemented |
 | `assert` | Evaluate a pass/fail condition | Implemented |
 | `addresses` | Link an objective to a need | Planned |

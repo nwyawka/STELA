@@ -33,3 +33,8 @@ mbse check examples/rover.mbse
 ```
 
 See [the user manual](docs/user-manual.md), [language charter](docs/language-charter.md), [syntax reference](docs/language-reference.md), and [roadmap](TODO.md).
+
+## Examples
+
+- [Rover braking model](examples/rover.mbse): executable with the current prototype.
+- [Exoplanet water instrument](examples/exoplanet-water-instrument/README.md): self-contained STELA 0.2 design example with science-source inputs, datasets, expected traceability, architecture, results, and acceptance criteria.

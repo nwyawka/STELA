@@ -1,0 +1,5 @@
+sample_id,temperature_k,read_noise_electron,accepted
+CAL-001,40,5.8,true
+CAL-002,42,6.0,true
+CAL-003,45,7.6,true
+

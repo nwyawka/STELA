@@ -1,0 +1,13 @@
+flowchart LR
+    telescope["telescope: Telescope"]
+    spectrometer["spectrometer: Spectrometer"]
+    detector["detector: Detector"]
+    electronics["electronics: Electronics"]
+    thermal["thermal_control: ThermalControl"]
+    calibration["calibration_source: CalibrationSource"]
+    telescope -- PhotonStream --> spectrometer
+    spectrometer -- SpectralPhotonStream --> detector
+    detector -- DetectorSamples --> electronics
+    thermal -. temperature control .-> detector
+    calibration -. calibration photons .-> spectrometer
+

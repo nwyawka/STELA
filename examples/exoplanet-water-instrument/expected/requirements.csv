@@ -1,0 +1,9 @@
+id,name,level,derived_from,allocated_to,satisfied_by,verification_method,verification_scenario
+MR-001,wavelength_coverage,measurement,MEAS-001,Instrument,,analysis,nominal_transit_observation
+MR-002,spectral_resolution,measurement,MEAS-001,Instrument,,analysis,nominal_transit_observation
+MR-003,signal_to_noise,measurement,MEAS-001,Instrument,,analysis,nominal_transit_observation
+INST-001,detector_wavelength_range,instrument,MR-001,Spectrometer,Spectrometer,test,nominal_transit_observation
+INST-002,instrument_resolving_power,instrument,MR-002,Spectrometer,Spectrometer,test,nominal_transit_observation
+INST-003,detector_noise,instrument,MR-003,Detector,Detector,test,detector_noise_test
+SYS-001,pointing_stability,system,MR-003,Observatory,Observatory,analysis,nominal_transit_observation
+OPS-001,observation_duration,operations,MR-003,Operations,Operations,demonstration,nominal_transit_observation

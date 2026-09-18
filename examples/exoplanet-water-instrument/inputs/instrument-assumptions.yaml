@@ -1,0 +1,11 @@
+schema: InstrumentAssumptions
+version: "1.0"
+assumptions:
+  detector_temperature_k: 42
+  detector_read_noise_electron: 6
+  spectrometer_wavelength_min_um: 2.5
+  spectrometer_wavelength_max_um: 3.0
+  spectrometer_resolving_power: 1200
+  signal_electrons_per_resolution_element: 1200
+  total_noise_electrons_per_resolution_element: 100
+
