@@ -316,6 +316,8 @@ Under constant deceleration:
 
 The example includes a static visualization at [expected/braking-profile.png](expected/braking-profile.png), an interactive HTML version, and the SVG source used for the PNG.
 
+![Rover emergency-braking velocity, distance, and acceleration plotted against time](expected/braking-profile.png)
+
 ## Errors the example can expose
 
 The current validator detects several classes of problem:
