@@ -1,0 +1,136 @@
+<div id="braking-profile-viz">
+  <h2>Emergency braking profile</h2>
+  <div class="viz-row text-small text-muted" aria-label="Model assumptions">
+    <span>Initial velocity: 2.00 m/s</span>
+    <span>Constant deceleration: 1.50 m/s²</span>
+    <span>Stop time: 1.33 s</span>
+    <span>Stopping distance: 1.33 m</span>
+  </div>
+  <div class="braking-plot" data-key="velocity" data-label="Velocity" data-unit="m/s"></div>
+  <div class="braking-plot" data-key="distance" data-label="Distance traveled" data-unit="m"></div>
+  <div class="braking-plot" data-key="acceleration" data-label="Acceleration" data-unit="m/s²"></div>
+  <div class="tooltip" role="tooltip" hidden></div>
+</div>
+
+<style>
+  #braking-profile-viz { width: 100%; }
+  #braking-profile-viz h2 { margin-bottom: 0.35rem; }
+  #braking-profile-viz .viz-row { gap: 0.45rem 1.25rem; margin-bottom: 0.65rem; }
+  #braking-profile-viz .braking-plot { width: 100%; min-height: 185px; }
+  #braking-profile-viz .plot-svg { display: block; width: 100%; height: auto; }
+  #braking-profile-viz .plot-frame { fill: transparent; stroke: var(--border); stroke-width: 1; }
+  #braking-profile-viz .grid line { stroke: var(--border); stroke-opacity: 0.55; }
+  #braking-profile-viz .grid path { display: none; }
+  #braking-profile-viz .axis path,
+  #braking-profile-viz .axis line { stroke: var(--border); }
+  #braking-profile-viz .axis text,
+  #braking-profile-viz .axis-title,
+  #braking-profile-viz .panel-title,
+  #braking-profile-viz .endpoint-label { fill: var(--foreground); font-size: 12px; }
+  #braking-profile-viz .panel-title { font-weight: 500; }
+  #braking-profile-viz .series-line { fill: none; stroke: var(--viz-series-1); stroke-width: 2.5; }
+  #braking-profile-viz .endpoint { fill: var(--viz-series-1); }
+  #braking-profile-viz .hover-guide { stroke: var(--foreground); stroke-width: 1; stroke-opacity: 0.55; pointer-events: none; }
+  #braking-profile-viz .hover-marker { fill: var(--background); stroke: var(--viz-series-1); stroke-width: 2; pointer-events: none; }
+  #braking-profile-viz .hit-overlay { fill: transparent; cursor: crosshair; }
+  #braking-profile-viz .tooltip { position: absolute; pointer-events: none; background: var(--popover); color: var(--popover-foreground); padding: 0.4rem 0.55rem; border-radius: 0.35rem; font-size: 12px; }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script>
+(() => {
+  const root = document.getElementById("braking-profile-viz");
+  const v0 = 2.0;
+  const decel = 1.5;
+  const stopTime = v0 / decel;
+  const stopDistance = (v0 * v0) / (2 * decel);
+  const count = 81;
+  const data = d3.range(count).map(i => {
+    const time = stopTime * i / (count - 1);
+    return {
+      time,
+      velocity: Math.max(0, v0 - decel * time),
+      distance: Math.min(stopDistance, v0 * time - 0.5 * decel * time * time),
+      acceleration: i === count - 1 ? 0 : -decel
+    };
+  });
+  const tooltip = root.querySelector(".tooltip");
+  const format = d3.format(".2f");
+
+  function draw(container) {
+    container.replaceChildren();
+    const key = container.dataset.key;
+    const label = container.dataset.label;
+    const unit = container.dataset.unit;
+    const width = Math.max(320, container.getBoundingClientRect().width || 736);
+    const height = 185;
+    const margin = {top: 28, right: 72, bottom: 44, left: 64};
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+    const values = data.map(d => d[key]);
+    const rawExtent = d3.extent(values);
+    const spread = Math.max(0.25, rawExtent[1] - rawExtent[0]);
+    const y = d3.scaleLinear()
+      .domain([rawExtent[0] - spread * 0.1, rawExtent[1] + spread * 0.12])
+      .nice()
+      .range([innerHeight, 0]);
+    const x = d3.scaleLinear()
+      .domain([-stopTime * 0.025, stopTime * 1.025])
+      .range([0, innerWidth]);
+
+    const svg = d3.select(container).append("svg")
+      .attr("class", "plot-svg")
+      .attr("viewBox", `0 0 ${width} ${height}`)
+      .attr("role", "img")
+      .attr("aria-label", `${label} versus time during constant-deceleration braking`);
+    svg.append("title").text(`${label} versus time`);
+    svg.append("desc").text(`Rover braking from 2 meters per second at 1.5 meters per second squared, stopping after ${format(stopTime)} seconds.`);
+    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+    g.append("rect").attr("class", "plot-frame").attr("data-chart-frame", "").attr("width", innerWidth).attr("height", innerHeight);
+    g.append("g").attr("class", "grid").call(d3.axisLeft(y).ticks(4).tickSize(-innerWidth).tickFormat(""));
+    g.append("g").attr("class", "axis").attr("transform", `translate(0,${innerHeight})`)
+      .call(d3.axisBottom(x).ticks(width < 430 ? 3 : 5).tickFormat(d => format(d)));
+    g.append("g").attr("class", "axis").call(d3.axisLeft(y).ticks(4));
+    svg.append("text").attr("class", "panel-title").attr("x", margin.left).attr("y", 16).text(label);
+    svg.append("text").attr("class", "axis-title").attr("data-axis", "x")
+      .attr("x", margin.left + innerWidth / 2).attr("y", height - 5).attr("text-anchor", "middle").text("Time (s)");
+    svg.append("text").attr("class", "axis-title").attr("data-axis", "y")
+      .attr("transform", `translate(14,${margin.top + innerHeight / 2}) rotate(-90)`).attr("text-anchor", "middle").text(`${label} (${unit})`);
+    const line = d3.line().x(d => x(d.time)).y(d => y(d[key]));
+    g.append("path").datum(data).attr("class", "series-line").attr("d", line);
+    const end = data[data.length - 1];
+    g.append("circle").attr("class", "endpoint").attr("cx", x(end.time)).attr("cy", y(end[key])).attr("r", 3.5);
+    g.append("text").attr("class", "endpoint-label").attr("x", innerWidth + 7)
+      .attr("y", Math.max(12, Math.min(innerHeight - 4, y(end[key]) + 4))).text(`${format(end[key])} ${unit}`);
+
+    const guide = g.append("line").attr("class", "hover-guide").attr("data-chart-hover-guide", "")
+      .attr("y1", 0).attr("y2", innerHeight).style("display", "none");
+    const marker = g.append("circle").attr("class", "hover-marker").attr("data-chart-hover-marker", "")
+      .attr("r", 4).style("display", "none");
+    g.append("rect").attr("class", "hit-overlay").attr("data-chart-hit", "")
+      .attr("data-chart-hover-overlay", "cross-series").attr("width", innerWidth).attr("height", innerHeight)
+      .on("pointermove", event => {
+        const [px] = d3.pointer(event);
+        const time = Math.max(0, Math.min(stopTime, x.invert(px)));
+        const idx = d3.bisector(d => d.time).center(data, time);
+        const d = data[idx];
+        guide.style("display", null).attr("x1", x(time)).attr("x2", x(time));
+        marker.style("display", null).attr("cx", x(time)).attr("cy", y(d[key]));
+        tooltip.hidden = false;
+        tooltip.textContent = `${format(time)} s · ${format(d[key])} ${unit}`;
+        const bounds = root.getBoundingClientRect();
+        tooltip.style.left = `${Math.min(bounds.width - 145, margin.left + x(time) + 12)}px`;
+        tooltip.style.top = `${container.offsetTop + margin.top + Math.max(0, y(d[key]) - 18)}px`;
+      })
+      .on("pointerleave", () => {
+        guide.style("display", "none");
+        marker.style("display", "none");
+        tooltip.hidden = true;
+      });
+  }
+
+  const redraw = () => root.querySelectorAll(".braking-plot").forEach(draw);
+  redraw();
+  new ResizeObserver(redraw).observe(root);
+})();
+</script>

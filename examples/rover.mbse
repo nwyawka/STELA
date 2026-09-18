@@ -1,0 +1,39 @@
+model Rover
+
+requirement safe_braking:
+    id: REQ-001
+    shall emergency_stop.stopping_distance <= 2 m
+    verify_by test
+
+component Controller:
+    port motor_command: Command out
+
+component Motor:
+    port command: Command in
+    port power: Power in
+
+component Battery:
+    port power: Power out
+
+component Rover:
+    property speed: m/s = 0
+    property deceleration: m/s^2 = 1.5
+    part controller: Controller
+    part motor: Motor
+    part battery: Battery
+    connect controller.motor_command -> motor.command
+    connect battery.power -> motor.power
+    satisfies REQ-001
+
+action emergency_stop:
+    input speed: m/s
+    input deceleration: m/s^2
+    output stopping_distance: m
+    set stopping_distance = speed * speed / (2 * deceleration)
+
+scenario braking_test:
+    set rover.speed = 2 m/s
+    perform emergency_stop with speed = rover.speed, deceleration = rover.deceleration
+    assert emergency_stop.stopping_distance <= 2 m
+    verifies REQ-001
+
