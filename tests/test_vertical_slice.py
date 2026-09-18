@@ -8,7 +8,7 @@ from mbselang.trace import trace_requirement
 from mbselang.validate import validate
 
 
-EXAMPLE = Path(__file__).parents[1] / "examples" / "rover.mbse"
+EXAMPLE = Path(__file__).parents[1] / "examples" / "rover" / "rover.mbse"
 
 
 class VerticalSliceTests(unittest.TestCase):

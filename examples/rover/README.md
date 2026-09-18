@@ -4,6 +4,16 @@ The rover model is STELA's first executable vertical slice. It demonstrates how 
 
 The source model is [rover.mbse](rover.mbse). It retains the prototype `.mbse` extension until the interpreter and examples complete their migration to the `.stela` convention.
 
+## Contents
+
+```text
+rover.mbse                       Executable prototype model
+README.md                        Example introduction and walkthrough
+expected/braking-profile.html    Interactive braking plot
+expected/braking-profile.png     Static braking plot
+expected/braking-profile.svg     Vector braking plot source
+```
+
 ## Engineering question
 
 Can a rover traveling at 2 m/s stop within 2 m when its available deceleration is 1.5 m/s²?
@@ -251,7 +261,7 @@ This means the `stopping_distance` output produced by the action performance in 
 From the repository root, validate the model:
 
 ```bash
-PYTHONPATH=src python3 -m mbselang check examples/rover.mbse
+PYTHONPATH=src python3 -m mbselang check examples/rover/rover.mbse
 ```
 
 Expected result:
@@ -263,7 +273,7 @@ OK: Rover (0 warning(s))
 Run the braking scenario:
 
 ```bash
-PYTHONPATH=src python3 -m mbselang run examples/rover.mbse braking_test
+PYTHONPATH=src python3 -m mbselang run examples/rover/rover.mbse braking_test
 ```
 
 Expected result:
@@ -276,7 +286,7 @@ PASS requirement REQ-001
 Inspect requirement traceability:
 
 ```bash
-PYTHONPATH=src python3 -m mbselang trace examples/rover.mbse REQ-001
+PYTHONPATH=src python3 -m mbselang trace examples/rover/rover.mbse REQ-001
 ```
 
 Expected relationship summary:
@@ -290,7 +300,7 @@ REQ-001
 Generate the architecture view:
 
 ```bash
-PYTHONPATH=src python3 -m mbselang render examples/rover.mbse
+PYTHONPATH=src python3 -m mbselang render examples/rover/rover.mbse
 ```
 
 The resulting Mermaid definition connects the controller and battery to the motor.
@@ -304,7 +314,7 @@ Under constant deceleration:
 - Acceleration remains at −1.5 m/s² until the rover stops.
 - Stopping time is approximately 1.33 seconds.
 
-The repository includes a static visualization at [braking-profile.png](../visualizations/braking-profile.png).
+The example includes a static visualization at [expected/braking-profile.png](expected/braking-profile.png), an interactive HTML version, and the SVG source used for the PNG.
 
 ## Errors the example can expose
 
@@ -382,4 +392,3 @@ A more realistic rover model could add:
 - Hardware test evidence attached to the verification record
 
 The deliberately small example remains useful because each future capability can be added without obscuring the original end-to-end trace.
-

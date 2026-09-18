@@ -16,7 +16,7 @@ science document
 
 ## Status
 
-This is a STELA 0.2 design example. It deliberately uses planned science-traceability prowords that the 0.1 prototype parser does not yet implement. The currently executable example remains `../rover.mbse`.
+This is a STELA 0.2 design example. It deliberately uses planned science-traceability prowords that the 0.1 prototype parser does not yet implement. The currently executable example is documented in `../rover/README.md`.
 
 ## Contents
 
@@ -61,4 +61,3 @@ The generated artifacts should semantically match the files in `expected/`.
 | `observing-conditions.yaml` | Mission Systems Team | Observatory performance conditions |
 | `instrument-assumptions.yaml` | Instrument Systems Team | Early design assumptions |
 | `calibration-data.csv` | Instrument Test Team | Verification evidence input |
-

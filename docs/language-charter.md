@@ -41,7 +41,7 @@ The rover model must demonstrate measurable requirements, component decompositio
 
 The implementation can:
 
-1. Parse `examples/rover.mbse`.
+1. Parse `examples/rover/rover.mbse`.
 2. Validate names, connections, port directions, interface types, references, and units.
 3. Execute `braking_test` deterministically.
 4. Report assertion and requirement pass/fail results.

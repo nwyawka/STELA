@@ -81,7 +81,7 @@ A STELA source file conventionally uses the `.stela` extension.
 model Example
 ```
 
-The prototype interpreter accepts any filename and currently includes a legacy `examples/rover.mbse` file. That example will move to `.stela` when the implementation package and CLI are renamed.
+The prototype interpreter accepts any filename and currently includes a legacy `examples/rover/rover.mbse` file. That example will move to `.stela` when the implementation package and CLI are renamed.
 
 ### 2.1 Indentation
 
@@ -1043,10 +1043,10 @@ Finally, engineering scenarios verify requirements while a science-retrieval sce
 Currently implemented:
 
 ```bash
-PYTHONPATH=src python3 -m mbselang check examples/rover.mbse
-PYTHONPATH=src python3 -m mbselang run examples/rover.mbse braking_test
-PYTHONPATH=src python3 -m mbselang trace examples/rover.mbse REQ-001
-PYTHONPATH=src python3 -m mbselang render examples/rover.mbse
+PYTHONPATH=src python3 -m mbselang check examples/rover/rover.mbse
+PYTHONPATH=src python3 -m mbselang run examples/rover/rover.mbse braking_test
+PYTHONPATH=src python3 -m mbselang trace examples/rover/rover.mbse REQ-001
+PYTHONPATH=src python3 -m mbselang render examples/rover/rover.mbse
 ```
 
 Planned STELA science and requirement queries:
